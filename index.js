@@ -1,5 +1,5 @@
 var player = "x";
-var gameStatus = [];
+var spotsPlayed = [];
 var xspots = [
 	"xone",
 	"xtwo",
@@ -23,29 +23,7 @@ var ospots = [
 	"onine",
 ];
 
-// var xwins = [
-// 	["xone", "xtwo", "xthree"],
-// 	["xfour", "xfive", "xsix"],
-// 	["xseven", "xeight", "xnine"],
-// 	["xone", "xfive", "xseven"],
-// 	["xtwo", "xsix", "xeight"],
-// 	["xthree", "xseven", "xnine"],
-// 	["xone", "xfive", "xnine"],
-// 	["xthree", "xfive", "xseven"],
-// ];
-
-var owins = [
-	["oone", "otwo", "othree"],
-	["ofour", "ofive", "osix"],
-	["oseven", "oeight", "onine"],
-	["oone", "ofive", "oseven"],
-	["otwo", "osix", "oeight"],
-	["othree", "oseven", "onine"],
-	["oone", "ofive", "onine"],
-	["othree", "ofive", "oseven"],
-];
-
-var xwins = [
+var winningConditions = [
 	[0, 1, 2],
 	[3, 4, 5],
 	[6, 7, 8],
@@ -56,19 +34,15 @@ var xwins = [
 	[2, 4, 6],
 ];
 
-var xselections = [];
-var oselections = [];
-
-console.log(xwins);
-console.log(owins);
+var gameStatus = ["", "", "", "", "", "", "", "", ""];
 
 var one = document.getElementById("one");
 let all = document.querySelectorAll(".slot");
 
-console.log(all);
-
 all.forEach((element) => element.addEventListener("click", getSelection));
-/* Get the spot that user selected */
+/**
+ * Get the spot on the board that the user has selected
+ */
 function getSelection() {
 	for (let i = 0; i <= 8; i++) {
 		if (all[i].checked === true) {
@@ -76,18 +50,24 @@ function getSelection() {
 		}
 	}
 }
-/* Checks the spot that the user has selected */
+/**
+ * Validates the spot that the user selected to make sure it is free to be used
+ * @param i number - Carries the number of the spot in which the user selected
+ */
 function checkSelection(i) {
 	// console.log(i);
-	let exists = gameStatus.find((e) => e === i);
+	let exists = spotsPlayed.find((e) => e === i);
 	if (typeof exists == "number") {
 		/* Do nothing as the number has already been selected */
 	} else {
-		gameStatus.push(i);
+		spotsPlayed.push(i);
 		handlePlayer(i);
 	}
 }
-/* Handles the player change of the game */
+/**
+ * Handles the changing of the player
+ * @param i number - Carries the number of the spot in which the user selected
+ */
 function handlePlayer(i) {
 	if (player === "x") {
 		xspot(i);
@@ -95,71 +75,59 @@ function handlePlayer(i) {
 		player = "o";
 	} else if (player === "o") {
 		ospot(i);
-		/*Check if player won */
+		checkIfPlayerWon();
 		player = "x";
 	}
 }
 
-/* marks the spot that was selected into a X */
+/**
+ * Marks the spot selected with a X
+ * @param i number - Carries the number of the spot in which the user selected
+ */
 function xspot(i) {
 	for (let j = 0; j <= 8; j++) {
 		if (j === i) {
-			// console.log(xspots[j]);
 			document.getElementById(xspots[j]).style.visibility = "visible";
 			document.getElementById(ospots[j]).style.visibility = "hidden";
-			xselections.push("X");
-			// console.log(xselections);
+			gameStatus.splice(i, 1, "X"); // Splice method used here means that at spot i replace 1 element with the conets of "X"
 		}
 	}
 }
-/* marks the spot that was selected into a O */
+/**
+ * Marks the spot selected with a O
+ * @param i number - Carries the number of the spot in which the user selected
+ */
 function ospot(i) {
 	for (let j = 0; j <= 8; j++) {
 		if (j === i) {
-			// console.log(ospots[j]);
 			document.getElementById(xspots[j]).style.visibility = "hidden";
 			document.getElementById(ospots[j]).style.visibility = "visible";
-			oselections.push(ospots[j]);
-			// console.log(oselections);
+			gameStatus.splice(i, 1, "O"); // Splice method used here means that at spot i replace 1 element with the conets of "O"
 		}
 	}
 }
-
+/**
+ * Checks the current status of the game to see if a player has won or not
+ */
 function checkIfPlayerWon() {
 	for (let p = 0; p <= 7; p++) {
-		const winCondition = xwins[p];
-		// console.log(winCondition);
-		// console.log(xselections[winCondition[0]]);
-		let a = xselections[winCondition[0]];
-		let b = xselections[winCondition[1]];
-		let c = xselections[winCondition[2]];
-		console.log(a);
-		console.log(b);
-		console.log(c);
-		if (
-			typeof a === "undefined" ||
-			typeof b === "undefined" ||
-			typeof c === "undefined"
-		) {
+		const winCondition = winningConditions[p];
+
+		let a = gameStatus[winCondition[0]];
+		let b = gameStatus[winCondition[1]];
+		let c = gameStatus[winCondition[2]];
+
+		if (a === "" || b === "" || c === "") {
 			continue;
 		}
+
 		if (a === b && b === c) {
-			console.log("X has won the game");
+			if (player === "x") {
+				console.log("X has won the game");
+			}
+			if (player === "o") {
+				console.log("O has won the game");
+			}
 		}
 	}
-	// let j = 0;
-	// for (let k = 0; k < xselections.length; k++) {
-	// 	for (let p = 0; p < xwins.length; p++) {
-	// 		let check1 = xwins[p][0].includes(xselections[j]);
-	// 		console.log(check1);
-	// 		if (check1 == true) {
-	// 			let check2 = xwins[p][1].includes(xselections[j + 1]);
-	// 			console.log(check2);
-	// 			if (check2 == true) {
-	// 				let check3 = xwins[p][2].includes(xselections[j + 2]);
-	// 				console.log(check3);
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
