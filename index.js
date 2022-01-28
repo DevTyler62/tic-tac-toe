@@ -36,14 +36,17 @@ var winningConditions = [
 
 var gameStatus = ["", "", "", "", "", "", "", "", ""];
 
-var one = document.getElementById("one");
-let all = document.querySelectorAll(".slot");
+let restart = document.getElementById("restart");
+restart.addEventListener("click", setUpNewGame);
 
+let all = document.querySelectorAll(".slot");
 all.forEach((element) => element.addEventListener("click", getSelection));
 /**
  * Get the spot on the board that the user has selected
  */
 function getSelection() {
+	console.log(spotsPlayed);
+	console.log(gameStatus);
 	for (let i = 0; i <= 8; i++) {
 		if (all[i].checked === true) {
 			checkSelection(i);
@@ -123,11 +126,64 @@ function checkIfPlayerWon() {
 
 		if (a === b && b === c) {
 			if (player === "x") {
-				console.log("X has won the game");
+				swal({
+					title: "X Won the Game",
+					icon: "success",
+					buttons: {
+						okay: "Ok",
+						newGame: "New Game",
+					},
+				}).then((value) => {
+					switch (value) {
+						case "newGame":
+							setUpNewGame();
+							break;
+						default:
+						/* Nothing to be done since it is just canceling the game */
+					}
+				});
 			}
 			if (player === "o") {
-				console.log("O has won the game");
+				swal({
+					title: "O Won the Game",
+					icon: "success",
+					buttons: {
+						okay: "Ok",
+						newGame: "New Game",
+					},
+				}).then((value) => {
+					switch (value) {
+						case "newGame":
+							setUpNewGame();
+							break;
+						default:
+						/* Nothing to be done since it is just canceling the game */
+					}
+				});
 			}
 		}
 	}
+}
+/**
+ * Sets up a new game to be played
+ */
+function setUpNewGame() {
+	for (let r = 0; r < spotsPlayed.length; r++) {
+		const found = gameStatus[spotsPlayed[r]];
+		if (found === "X") {
+			document.getElementById(xspots[spotsPlayed[r]]).style.visibility =
+				"hidden";
+		} else if (found === "O") {
+			document.getElementById(ospots[spotsPlayed[r]]).style.visibility =
+				"hidden";
+		}
+	}
+	for (let t = 0; t < gameStatus.length; t++) {
+		if (gameStatus[t] !== "") {
+			gameStatus[t] = "";
+		}
+	}
+	spotsPlayed = [];
+	player = "x";
+	window.location.reload();
 }
