@@ -71,7 +71,7 @@ input {
 }
 
 .icon__img {
-	width: 50%;
+	width: 80%;
 	visibility: hidden;
 	position: absolute;
 }
@@ -80,9 +80,11 @@ input {
 	padding: 1rem;
 	border-radius: 12px;
 	border: none;
-	color: #f7f5fb;
+	color: #000000;
 	background-color: #f9ab55;
 	cursor: pointer;
+	font-weight: 600;
+	font-size: 105%;
 }
 
 @media screen and (min-width: 576px) {
