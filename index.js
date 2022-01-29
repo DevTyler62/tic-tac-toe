@@ -140,8 +140,15 @@ function checkIfPlayerWon() {
 						case "newGame":
 							setUpNewGame();
 							break;
+						case "okay":
+							all.forEach((element) =>
+								element.removeEventListener("click", getSelection)
+							);
+							break;
 						default:
-						/* Nothing to be done since it is just canceling the game */
+							all.forEach((element) =>
+								element.removeEventListener("click", getSelection)
+							);
 					}
 				});
 			}
@@ -158,8 +165,15 @@ function checkIfPlayerWon() {
 						case "newGame":
 							setUpNewGame();
 							break;
+						case "okay":
+							all.forEach((element) =>
+								element.removeEventListener("click", getSelection)
+							);
+							break;
 						default:
-						/* Nothing to be done since it is just canceling the game */
+							all.forEach((element) =>
+								element.removeEventListener("click", getSelection)
+							);
 					}
 				});
 			}
