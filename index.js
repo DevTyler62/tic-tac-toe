@@ -76,10 +76,12 @@ function handlePlayer(i) {
 		xspot(i);
 		checkIfPlayerWon();
 		player = "o";
+		document.getElementById("player").textContent = "O";
 	} else if (player === "o") {
 		ospot(i);
 		checkIfPlayerWon();
 		player = "x";
+		document.getElementById("player").textContent = "X";
 	}
 }
 

@@ -27,11 +27,15 @@ body {
 
 .information {
 	margin-top: 2rem;
-	margin-bottom: 6rem;
+	margin-bottom: 4rem;
+}
+
+.current__player {
+	margin-bottom: 2rem;
 }
 
 .gameboard {
-	margin-bottom: 10rem;
+	margin-bottom: 6rem;
 }
 
 .first__row {
