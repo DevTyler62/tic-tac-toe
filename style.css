@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500&display=swap");
+
 * {
 	box-sizing: border-box;
 	margin: 0;
@@ -6,6 +8,7 @@
 
 body {
 	background-color: #909cc2;
+	font-family: "Rubik", sans-serif;
 }
 
 .container {
@@ -24,13 +27,11 @@ body {
 
 .information {
 	margin-top: 2rem;
-	margin-bottom: 8rem;
+	margin-bottom: 6rem;
 }
 
 .gameboard {
 	margin-bottom: 10rem;
-	/* display: flex;
-	flex-direction: row; */
 }
 
 .first__row {
