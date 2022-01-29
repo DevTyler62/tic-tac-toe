@@ -28,6 +28,9 @@ body {
 .information {
 	margin-top: 2rem;
 	margin-bottom: 4rem;
+	margin-right: 4rem;
+	margin-left: 4rem;
+	text-align: center;
 }
 
 .current__player {

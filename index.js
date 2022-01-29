@@ -45,8 +45,6 @@ all.forEach((element) => element.addEventListener("click", getSelection));
  * Get the spot on the board that the user has selected
  */
 function getSelection() {
-	console.log(spotsPlayed);
-	console.log(gameStatus);
 	for (let i = 0; i <= 8; i++) {
 		if (all[i].checked === true) {
 			checkSelection(i);
@@ -58,7 +56,6 @@ function getSelection() {
  * @param i number - Carries the number of the spot in which the user selected
  */
 function checkSelection(i) {
-	// console.log(i);
 	let exists = spotsPlayed.find((e) => e === i);
 	if (typeof exists == "number") {
 		/* Do nothing as the number has already been selected */
