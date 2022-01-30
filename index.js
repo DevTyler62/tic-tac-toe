@@ -34,7 +34,8 @@ var winningConditions = [
 	[2, 4, 6],
 ];
 
-var gameStatus = ["", "", "", "", "", "", "", "", ""];
+let gameStatus = ["", "", "", "", "", "", "", "", ""];
+let winner = false;
 
 let restart = document.getElementById("restart");
 restart.addEventListener("click", setUpNewGame);
@@ -72,16 +73,17 @@ function handlePlayer(i) {
 	if (player === "x") {
 		xspot(i);
 		checkIfPlayerWon();
+		checkIfTie();
 		player = "o";
 		document.getElementById("player").textContent = "O";
 	} else if (player === "o") {
 		ospot(i);
 		checkIfPlayerWon();
+		checkIfTie();
 		player = "x";
 		document.getElementById("player").textContent = "X";
 	}
 }
-
 /**
  * Marks the spot selected with a X
  * @param i number - Carries the number of the spot in which the user selected
@@ -127,7 +129,7 @@ function checkIfPlayerWon() {
 			if (player === "x") {
 				swal({
 					title: "X Won the Game",
-					icon: "success",
+					icon: "./img/celebration.png",
 					buttons: {
 						okay: "Ok",
 						newGame: "New Game",
@@ -148,11 +150,12 @@ function checkIfPlayerWon() {
 							);
 					}
 				});
+				winner = true;
 			}
 			if (player === "o") {
 				swal({
 					title: "O Won the Game",
-					icon: "success",
+					icon: "./img/celebration.png",
 					buttons: {
 						okay: "Ok",
 						newGame: "New Game",
@@ -173,35 +176,42 @@ function checkIfPlayerWon() {
 							);
 					}
 				});
+				winner = true;
 			}
-		}
-		if (spotsPlayed.length == 9) {
-			swal({
-				title: "Tie Game",
-				icon: "success",
-				buttons: {
-					okay: "Ok",
-					newGame: "New Game",
-				},
-			}).then((value) => {
-				switch (value) {
-					case "newGame":
-						setUpNewGame();
-						break;
-					case "okay":
-						all.forEach((element) =>
-							element.removeEventListener("click", getSelection)
-						);
-						break;
-					default:
-						all.forEach((element) =>
-							element.removeEventListener("click", getSelection)
-						);
-				}
-			});
 		}
 	}
 }
+/**
+ * Checks if there is a tie in the game if no winner has been selected
+ */
+function checkIfTie() {
+	if (spotsPlayed.length == 9 && !gameStatus.includes("") && winner == false) {
+		swal({
+			title: "Tie Game",
+			icon: "./img/tie.png",
+			buttons: {
+				okay: "Ok",
+				newGame: "New Game",
+			},
+		}).then((value) => {
+			switch (value) {
+				case "newGame":
+					setUpNewGame();
+					break;
+				case "okay":
+					all.forEach((element) =>
+						element.removeEventListener("click", getSelection)
+					);
+					break;
+				default:
+					all.forEach((element) =>
+						element.removeEventListener("click", getSelection)
+					);
+			}
+		});
+	}
+}
+
 /**
  * Sets up a new game to be played
  */
