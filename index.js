@@ -175,6 +175,31 @@ function checkIfPlayerWon() {
 				});
 			}
 		}
+		if (spotsPlayed.length == 9) {
+			swal({
+				title: "Tie Game",
+				icon: "success",
+				buttons: {
+					okay: "Ok",
+					newGame: "New Game",
+				},
+			}).then((value) => {
+				switch (value) {
+					case "newGame":
+						setUpNewGame();
+						break;
+					case "okay":
+						all.forEach((element) =>
+							element.removeEventListener("click", getSelection)
+						);
+						break;
+					default:
+						all.forEach((element) =>
+							element.removeEventListener("click", getSelection)
+						);
+				}
+			});
+		}
 	}
 }
 /**
