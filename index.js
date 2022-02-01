@@ -37,11 +37,18 @@ var winningConditions = [
 let gameStatus = ["", "", "", "", "", "", "", "", ""];
 let winner = false;
 
+let gameTypePlayer = document.getElementById("twoplayer");
+// gameTypePlayer.addEventListener("click", playerStart);
+
+let gameTypeComputer = document.getElementById("computer");
+gameTypeComputer.addEventListener("click", computerStart);
+
 let restart = document.getElementById("restart");
 restart.addEventListener("click", setUpNewGame);
 
 let all = document.querySelectorAll(".slot");
 all.forEach((element) => element.addEventListener("click", getSelection));
+
 /**
  * Get the spot on the board that the user has selected
  */
@@ -234,4 +241,21 @@ function setUpNewGame() {
 	spotsPlayed = [];
 	player = "x";
 	window.location.reload();
+}
+
+/* Computer Code */
+
+function computerStart(i) {
+	let exists = spotsPlayed.find((e) => e === i);
+	if (typeof exists == "number") {
+		/* Do nothing as the number has already been selected */
+	} else {
+		pickSpot1();
+	}
+}
+
+function pickSpot1() {
+	let firstPick = Math.floor(Math.random() * 9);
+	let taken = spotsPlayed.find((p) => p === firstPick);
+	console.log(taken);
 }
