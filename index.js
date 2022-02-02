@@ -296,7 +296,6 @@ function pickSpot1() {
 		setTimeout(function () {
 			ospot(firstPick);
 		}, 2000);
-		// ospot(firstPick);
 	} else {
 		pickSpot1();
 	}
@@ -311,7 +310,6 @@ function pickSpot2() {
 		setTimeout(function () {
 			ospot(secondPick);
 		}, 2000);
-		// ospot(firstPick);
 	} else {
 		pickSpot2();
 	}
