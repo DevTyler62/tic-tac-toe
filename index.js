@@ -42,6 +42,7 @@ let gameTypePlayer = document.getElementById("twoplayer");
 
 let gameTypeComputer = document.getElementById("computer");
 gameTypeComputer.addEventListener("click", computerStart);
+let computer = false;
 
 let restart = document.getElementById("restart");
 restart.addEventListener("click", setUpNewGame);
@@ -77,19 +78,39 @@ function checkSelection(i) {
  * @param i number - Carries the number of the spot in which the user selected
  */
 function handlePlayer(i) {
-	if (player === "x") {
+	if (player === "x" && computer === false) {
 		xspot(i);
 		checkIfPlayerWon();
 		checkIfTie();
 		player = "o";
 		document.getElementById("player").textContent = "O";
-	} else if (player === "o") {
+	} else if (player === "o" && computer === false) {
 		ospot(i);
 		checkIfPlayerWon();
 		checkIfTie();
 		player = "x";
 		document.getElementById("player").textContent = "X";
 	}
+
+	if (player === "x" && computer === true) {
+		xspot(i);
+		checkIfPlayerWon();
+		checkIfTie();
+		player = "computer";
+		document.getElementById("player").textContent = "O";
+		if (player === "computer") {
+			computerPlayer(i);
+			checkIfPlayerWon();
+			checkIfTie();
+			document.getElementById("player").textContent = "X";
+			player = "x";
+		}
+	}
+	// } else if (player === "computer" && computer === true) {
+	// 	computerPlayer(i);
+	// 	player = "x";
+	// 	document.getElementById("player").textContent = "X";
+	// }
 }
 /**
  * Marks the spot selected with a X
@@ -245,17 +266,53 @@ function setUpNewGame() {
 
 /* Computer Code */
 
-function computerStart(i) {
-	let exists = spotsPlayed.find((e) => e === i);
-	if (typeof exists == "number") {
-		/* Do nothing as the number has already been selected */
-	} else {
-		pickSpot1();
+function computerStart() {
+	computer = true;
+}
+
+function computerPlayer(i) {
+	let occurrences = gameStatus.reduce((a, v) => (v === "O" ? a + 1 : a), 0);
+	console.log(occurrences);
+	// if (occurrences === 0) {
+	// 	pickSpot1();
+	// }
+	switch (occurrences) {
+		case 0:
+			pickSpot1();
+			break;
+		case 1:
+			pickSpot2();
+			break;
+		default:
 	}
 }
 
 function pickSpot1() {
 	let firstPick = Math.floor(Math.random() * 9);
+	console.log(firstPick);
 	let taken = spotsPlayed.find((p) => p === firstPick);
 	console.log(taken);
+	if (typeof taken === "undefined") {
+		setTimeout(function () {
+			ospot(firstPick);
+		}, 2000);
+		// ospot(firstPick);
+	} else {
+		pickSpot1();
+	}
+}
+
+function pickSpot2() {
+	let secondPick = Math.floor(Math.random() * 9);
+	console.log(secondPick);
+	let taken = spotsPlayed.find((p) => p === secondPick);
+	console.log(taken);
+	if (typeof taken === "undefined") {
+		setTimeout(function () {
+			ospot(secondPick);
+		}, 2000);
+		// ospot(firstPick);
+	} else {
+		pickSpot2();
+	}
 }
