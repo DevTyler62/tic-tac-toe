@@ -108,7 +108,7 @@ function handlePlayer(i) {
 					checkIfTie();
 					document.getElementById("player").textContent = "X";
 					player = "x";
-				}, 3000);
+				}, 6000);
 			}
 		}, 1000);
 	}
@@ -148,6 +148,7 @@ function ospot(i) {
  * Checks the current status of the game to see if a player has won or not
  */
 function checkIfPlayerWon() {
+	console.log("checking for win");
 	for (let p = 0; p <= 7; p++) {
 		const winCondition = winningConditions[p];
 
@@ -161,6 +162,7 @@ function checkIfPlayerWon() {
 
 		if (a === b && b === c) {
 			if (player === "x") {
+				console.log("In X");
 				swal({
 					title: "X Won the Game",
 					icon: "./img/celebration.png",
@@ -186,7 +188,8 @@ function checkIfPlayerWon() {
 				});
 				winner = true;
 			}
-			if (player === "o") {
+			if (player === "o" || player === "computer") {
+				console.log("In O");
 				swal({
 					title: "O Won the Game",
 					icon: "./img/celebration.png",
@@ -297,10 +300,12 @@ function computerPlayer(i) {
 
 function pickSpot1() {
 	let firstPick = Math.floor(Math.random() * 9);
+	// console.log(firstPick);
 	let taken = spotsPlayed.find((p) => p === firstPick);
 	if (typeof taken === "undefined") {
 		setTimeout(function () {
 			ospot(firstPick);
+			spotsPlayed.push(firstPick);
 		}, 2000);
 	} else {
 		pickSpot1();
@@ -316,7 +321,7 @@ function pickSpot2() {
 			xarray.push(m);
 		}
 	}
-	console.log(xarray);
+	// console.log(xarray);
 	for (let p = 0; p <= 7; p++) {
 		const winCondition = winningConditions[p];
 
@@ -326,45 +331,64 @@ function pickSpot2() {
 
 		if (a === xarray[0] || a === xarray[1]) {
 			if (b === xarray[0] || b === xarray[1]) {
-				console.log(a);
-				console.log(b);
-				console.log(c);
-				console.log("option 1");
+				// console.log(a);
+				// console.log(b);
+				// console.log(c);
+				// console.log("option 1");
 				spotPicked = true;
 				setTimeout(function () {
-					ospot(c);
+					if (gameStatus[c] === "O") {
+						// call to make a random pick
+						console.log("make random pick");
+						randomPick();
+					} else {
+						ospot(c);
+						spotsPlayed.push(c);
+					}
 				}, 2000);
 			} else if (c === xarray[0] || c === xarray[1]) {
-				console.log(a);
-				console.log(b);
-				console.log(c);
-				console.log("option 2");
+				// console.log(a);
+				// console.log(b);
+				// console.log(c);
+				// console.log("option 2");
 				spotPicked = true;
 				setTimeout(function () {
-					ospot(b);
+					if (gameStatus[b] === "O") {
+						// call to make a random pick
+						console.log("make random pick");
+						randomPick();
+					} else {
+						ospot(b);
+						spotsPlayed.push(b);
+					}
 				}, 2000);
 			}
 		}
-		if (p === 7 && spotPicked === false) {
-			let secondPick = Math.floor(Math.random() * 9);
-			let taken = spotsPlayed.find((p) => p === secondPick);
-			if (typeof taken === "undefined") {
-				setTimeout(function () {
-					ospot(secondPick);
-				}, 2000);
-			} else {
-				pickSpot2();
-			}
+	}
+	// console.log(spotPicked);
+	if (spotPicked === false) {
+		let secondPick = Math.floor(Math.random() * 9);
+		// console.log(secondPick);
+		let taken = spotsPlayed.find((p) => p === secondPick);
+		if (typeof taken === "undefined") {
+			setTimeout(function () {
+				ospot(secondPick);
+				spotsPlayed.push(secondPick);
+			}, 2000);
+		} else {
+			pickSpot2();
 		}
 	}
 }
 
 function pickSpot3() {
 	let thirdPick = Math.floor(Math.random() * 9);
+	// console.log(thirdPick);
 	let taken = spotsPlayed.find((p) => p === thirdPick);
 	if (typeof taken === "undefined") {
 		setTimeout(function () {
 			ospot(thirdPick);
+			spotsPlayed.push(thirdPick);
 		}, 2000);
 	} else {
 		pickSpot3();
@@ -373,12 +397,28 @@ function pickSpot3() {
 
 function pickSpot4() {
 	let fourthPick = Math.floor(Math.random() * 9);
+	// console.log(fourthPick);
 	let taken = spotsPlayed.find((p) => p === fourthPick);
 	if (typeof taken === "undefined") {
 		setTimeout(function () {
 			ospot(fourthPick);
+			spotsPlayed.push(fourthPick);
 		}, 2000);
 	} else {
 		pickSpot4();
+	}
+}
+
+function randomPick() {
+	let pick = Math.floor(Math.random() * 9);
+	// console.log("Random pick" + pick);
+	let taken = spotsPlayed.find((p) => p === pick);
+	if (typeof taken === "undefined") {
+		setTimeout(function () {
+			ospot(pick);
+			spotsPlayed.push(pick);
+		}, 2000);
+	} else {
+		randomPick();
 	}
 }
