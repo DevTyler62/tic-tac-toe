@@ -1,3 +1,7 @@
+/**
+ * Global variabale declerations
+ */
+
 var player = "x";
 var spotsPlayed = [];
 var xspots = [
@@ -38,7 +42,7 @@ let gameStatus = ["", "", "", "", "", "", "", "", ""];
 let winner = false;
 
 let gameTypePlayer = document.getElementById("twoplayer");
-// gameTypePlayer.addEventListener("click", playerStart);
+gameTypePlayer.addEventListener("click", twoPlayer);
 
 let gameTypeComputer = document.getElementById("computer");
 gameTypeComputer.addEventListener("click", computerStart);
@@ -55,8 +59,12 @@ all.forEach((element) => element.addEventListener("click", getSelection));
  */
 function getSelection() {
 	for (let i = 0; i <= 8; i++) {
-		if (all[i].checked === true) {
-			checkSelection(i);
+		if (player === "computer") {
+			// Do noting till the computer has picked its spot
+		} else {
+			if (all[i].checked === true) {
+				checkSelection(i);
+			}
 		}
 	}
 }
@@ -93,9 +101,7 @@ function handlePlayer(i) {
 	}
 
 	if (player === "x" && computer === true) {
-		all.forEach((element) =>
-			element.removeEventListener("click", getSelection)
-		);
+		// all.forEach((element) => element.removeEventListener("click", () => {}));
 		xspot(i);
 		checkIfPlayerWon();
 		checkIfTie();
@@ -110,9 +116,9 @@ function handlePlayer(i) {
 						checkIfTie();
 						document.getElementById("player").textContent = "X";
 						player = "x";
-						all.forEach((element) =>
-							element.addEventListener("click", getSelection)
-						);
+						// all.forEach((element) =>
+						// 	element.addEventListener("click", getSelection)
+						// );
 					}, 3000);
 				} else if (winner === true) {
 					// Do nothing as there has been a winner found
@@ -273,14 +279,32 @@ function setUpNewGame() {
 	window.location.reload();
 }
 
-/* Computer Code */
+/**
+ * If a game is being played and the user selects the "2 player" button again then it resets the game
+ */
+function twoPlayer() {
+	for (let i = 0; i < spotsPlayed.length; i++) {
+		if (spotsPlayed[i] !== null) {
+			setUpNewGame();
+		}
+	}
+}
 
+/*--------------------------*/
+/* START COMPUTER CODE */
+
+/**
+ * Initiates the starting of the computer code
+ */
 function computerStart() {
 	computer = true;
 	document.getElementById("gametype").textContent = "Computer";
 }
 
-function computerPlayer(i) {
+/**
+ * Runs the picking of the computer code
+ */
+function computerPlayer() {
 	let occurrences = gameStatus.reduce((a, v) => (v === "O" ? a + 1 : a), 0);
 	switch (occurrences) {
 		case 0:
@@ -299,10 +323,18 @@ function computerPlayer(i) {
 	}
 }
 
+/**
+ * Function for picking the first spot for the computer
+ * (Not a necessary function as it can just be called in the switch statement, kept in for better read ability
+ * same for functions 3 and 4 as well)
+ */
 function pickSpot1() {
 	randomPick();
 }
 
+/**
+ * Function for picking the second spot for the computer
+ */
 function pickSpot2() {
 	let spotPicked = false;
 	let xarray = [];
@@ -349,14 +381,23 @@ function pickSpot2() {
 	}
 }
 
+/**
+ * Function for picking spot 3 for the computer
+ */
 function pickSpot3() {
 	randomPick();
 }
 
+/**
+ * Function for picking spot 4 for the computer
+ */
 function pickSpot4() {
 	randomPick();
 }
 
+/**
+ * Finding a random spot on the board that is open to be selected for the computer
+ */
 function randomPick() {
 	let pick = Math.floor(Math.random() * 9);
 	let taken = spotsPlayed.find((p) => p === pick);
