@@ -17,6 +17,35 @@ body {
 	margin-right: 1.5rem;
 }
 
+.game__buttons {
+	display: flex;
+	gap: 1rem;
+	margin-bottom: 2rem;
+}
+
+.button {
+	padding: 0.7rem;
+	border-radius: 12px;
+	border: none;
+	cursor: pointer;
+	font-weight: 600;
+	font-size: 105%;
+}
+
+.first__button {
+	color: #000000;
+	background-color: #f56476;
+}
+
+.second__button {
+	color: #f0f3f5;
+	background-color: #642ca9;
+}
+
+.current__gametype {
+	margin-bottom: 1rem;
+}
+
 .flex__container {
 	height: 90vh;
 	display: flex;
@@ -35,6 +64,7 @@ body {
 
 .current__player {
 	margin-bottom: 2rem;
+	font-size: 1.5rem;
 }
 
 .gameboard {

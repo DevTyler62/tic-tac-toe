@@ -1,3 +1,7 @@
+/**
+ * Global variabale declerations
+ */
+
 var player = "x";
 var spotsPlayed = [];
 var xspots = [
@@ -37,18 +41,30 @@ var winningConditions = [
 let gameStatus = ["", "", "", "", "", "", "", "", ""];
 let winner = false;
 
+let gameTypePlayer = document.getElementById("twoplayer");
+gameTypePlayer.addEventListener("click", twoPlayer);
+
+let gameTypeComputer = document.getElementById("computer");
+gameTypeComputer.addEventListener("click", computerStart);
+let computer = false;
+
 let restart = document.getElementById("restart");
 restart.addEventListener("click", setUpNewGame);
 
 let all = document.querySelectorAll(".slot");
 all.forEach((element) => element.addEventListener("click", getSelection));
+
 /**
  * Get the spot on the board that the user has selected
  */
 function getSelection() {
 	for (let i = 0; i <= 8; i++) {
-		if (all[i].checked === true) {
-			checkSelection(i);
+		if (player === "computer") {
+			// Do noting till the computer has picked its spot
+		} else {
+			if (all[i].checked === true) {
+				checkSelection(i);
+			}
 		}
 	}
 }
@@ -70,18 +86,45 @@ function checkSelection(i) {
  * @param i number - Carries the number of the spot in which the user selected
  */
 function handlePlayer(i) {
-	if (player === "x") {
+	if (player === "x" && computer === false) {
 		xspot(i);
 		checkIfPlayerWon();
 		checkIfTie();
 		player = "o";
 		document.getElementById("player").textContent = "O";
-	} else if (player === "o") {
+	} else if (player === "o" && computer === false) {
 		ospot(i);
 		checkIfPlayerWon();
 		checkIfTie();
 		player = "x";
 		document.getElementById("player").textContent = "X";
+	}
+
+	if (player === "x" && computer === true) {
+		// all.forEach((element) => element.removeEventListener("click", () => {}));
+		xspot(i);
+		checkIfPlayerWon();
+		checkIfTie();
+		player = "computer";
+		document.getElementById("player").textContent = "Computer";
+		setTimeout(function () {
+			if (player === "computer") {
+				if (winner === false) {
+					computerPlayer(i);
+					setTimeout(function () {
+						checkIfPlayerWon();
+						checkIfTie();
+						document.getElementById("player").textContent = "X";
+						player = "x";
+						// all.forEach((element) =>
+						// 	element.addEventListener("click", getSelection)
+						// );
+					}, 3000);
+				} else if (winner === true) {
+					// Do nothing as there has been a winner found
+				}
+			}
+		}, 1000);
 	}
 }
 /**
@@ -152,7 +195,7 @@ function checkIfPlayerWon() {
 				});
 				winner = true;
 			}
-			if (player === "o") {
+			if (player === "o" || player === "computer") {
 				swal({
 					title: "O Won the Game",
 					icon: "./img/celebration.png",
@@ -234,4 +277,136 @@ function setUpNewGame() {
 	spotsPlayed = [];
 	player = "x";
 	window.location.reload();
+}
+
+/**
+ * If a game is being played and the user selects the "2 player" button again then it resets the game
+ */
+function twoPlayer() {
+	for (let i = 0; i < spotsPlayed.length; i++) {
+		if (spotsPlayed[i] !== null) {
+			setUpNewGame();
+		}
+	}
+}
+
+/*--------------------------*/
+/* START COMPUTER CODE */
+
+/**
+ * Initiates the starting of the computer code
+ */
+function computerStart() {
+	computer = true;
+	document.getElementById("gametype").textContent = "Computer";
+}
+
+/**
+ * Runs the picking of the computer code
+ */
+function computerPlayer() {
+	let occurrences = gameStatus.reduce((a, v) => (v === "O" ? a + 1 : a), 0);
+	switch (occurrences) {
+		case 0:
+			pickSpot1();
+			break;
+		case 1:
+			pickSpot2();
+			break;
+		case 2:
+			pickSpot3();
+			break;
+		case 3:
+			pickSpot4();
+			break;
+		default:
+	}
+}
+
+/**
+ * Function for picking the first spot for the computer
+ * (Not a necessary function as it can just be called in the switch statement, kept in for better read ability
+ * same for functions 3 and 4 as well)
+ */
+function pickSpot1() {
+	randomPick();
+}
+
+/**
+ * Function for picking the second spot for the computer
+ */
+function pickSpot2() {
+	let spotPicked = false;
+	let xarray = [];
+	for (let m = 0; m < gameStatus.length; m++) {
+		if (gameStatus[m] === "X") {
+			xarray.push(m);
+		}
+	}
+	for (let p = 0; p <= 7; p++) {
+		const winCondition = winningConditions[p];
+
+		let a = winCondition[0];
+		let b = winCondition[1];
+		let c = winCondition[2];
+
+		if (a === xarray[0] || a === xarray[1]) {
+			if (b === xarray[0] || b === xarray[1]) {
+				spotPicked = true;
+				setTimeout(function () {
+					if (gameStatus[c] === "O") {
+						// call to make a random pick since above condition was met
+						randomPick();
+					} else {
+						ospot(c);
+						spotsPlayed.push(c);
+					}
+				}, 2000);
+			} else if (c === xarray[0] || c === xarray[1]) {
+				spotPicked = true;
+				setTimeout(function () {
+					if (gameStatus[b] === "O") {
+						// call to make a random pick since above conditon was met
+						randomPick();
+					} else {
+						ospot(b);
+						spotsPlayed.push(b);
+					}
+				}, 2000);
+			}
+		}
+	}
+	if (spotPicked === false) {
+		randomPick();
+	}
+}
+
+/**
+ * Function for picking spot 3 for the computer
+ */
+function pickSpot3() {
+	randomPick();
+}
+
+/**
+ * Function for picking spot 4 for the computer
+ */
+function pickSpot4() {
+	randomPick();
+}
+
+/**
+ * Finding a random spot on the board that is open to be selected for the computer
+ */
+function randomPick() {
+	let pick = Math.floor(Math.random() * 9);
+	let taken = spotsPlayed.find((p) => p === pick);
+	if (typeof taken === "undefined") {
+		setTimeout(function () {
+			ospot(pick);
+			spotsPlayed.push(pick);
+		}, 2000);
+	} else {
+		randomPick();
+	}
 }
