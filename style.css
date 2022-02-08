@@ -42,6 +42,10 @@ body {
 	background-color: #642ca9;
 }
 
+.current__gametype {
+	margin-bottom: 1rem;
+}
+
 .flex__container {
 	height: 90vh;
 	display: flex;
@@ -60,6 +64,7 @@ body {
 
 .current__player {
 	margin-bottom: 2rem;
+	font-size: 1.5rem;
 }
 
 .gameboard {

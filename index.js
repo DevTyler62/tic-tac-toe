@@ -100,13 +100,11 @@ function handlePlayer(i) {
 		checkIfPlayerWon();
 		checkIfTie();
 		player = "computer";
-		document.getElementById("player").textContent = "O";
+		document.getElementById("player").textContent = "Computer";
 		setTimeout(function () {
 			if (player === "computer") {
 				if (winner === false) {
 					computerPlayer(i);
-					// checkIfPlayerWon();
-					// checkIfTie();
 					setTimeout(function () {
 						checkIfPlayerWon();
 						checkIfTie();
@@ -279,6 +277,7 @@ function setUpNewGame() {
 
 function computerStart() {
 	computer = true;
+	document.getElementById("gametype").textContent = "Computer";
 }
 
 function computerPlayer(i) {
