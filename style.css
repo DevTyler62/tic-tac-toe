@@ -20,7 +20,7 @@ body {
 .game__buttons {
 	display: flex;
 	gap: 1rem;
-	margin-bottom: 2rem;
+	margin-bottom: 1.25rem;
 }
 
 .button {
@@ -56,7 +56,7 @@ body {
 
 .information {
 	margin-top: 2rem;
-	margin-bottom: 4rem;
+	margin-bottom: 2rem;
 	margin-right: 4rem;
 	margin-left: 4rem;
 	text-align: center;
@@ -68,7 +68,7 @@ body {
 }
 
 .gameboard {
-	margin-bottom: 6rem;
+	margin-bottom: 4rem;
 }
 
 .first__row {
