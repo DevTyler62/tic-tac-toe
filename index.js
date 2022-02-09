@@ -170,53 +170,35 @@ function checkIfPlayerWon() {
 
 		if (a === b && b === c) {
 			if (player === "x") {
-				swal({
+				Swal.fire({
 					title: "X Won the Game",
-					icon: "./img/celebration.png",
-					buttons: {
-						okay: "Ok",
-						newGame: "New Game",
-					},
-				}).then((value) => {
-					switch (value) {
-						case "newGame":
-							setUpNewGame();
-							break;
-						case "okay":
-							all.forEach((element) =>
-								element.removeEventListener("click", getSelection)
-							);
-							break;
-						default:
-							all.forEach((element) =>
-								element.removeEventListener("click", getSelection)
-							);
+					imageUrl: "./img/celebration.png",
+					showCancelButton: true,
+					confirmButtonText: "New Game",
+				}).then((result) => {
+					if (result.isConfirmed) {
+						setUpNewGame();
+					} else {
+						all.forEach((element) =>
+							element.removeEventListener("click", getSelection)
+						);
 					}
 				});
 				winner = true;
 			}
 			if (player === "o" || player === "computer") {
-				swal({
+				Swal.fire({
 					title: "O Won the Game",
-					icon: "./img/celebration.png",
-					buttons: {
-						okay: "Ok",
-						newGame: "New Game",
-					},
-				}).then((value) => {
-					switch (value) {
-						case "newGame":
-							setUpNewGame();
-							break;
-						case "okay":
-							all.forEach((element) =>
-								element.removeEventListener("click", getSelection)
-							);
-							break;
-						default:
-							all.forEach((element) =>
-								element.removeEventListener("click", getSelection)
-							);
+					imageUrl: "./img/celebration.png",
+					showCancelButton: true,
+					confirmButtonText: "New Game",
+				}).then((result) => {
+					if (result.isConfirmed) {
+						setUpNewGame();
+					} else {
+						all.forEach((element) =>
+							element.removeEventListener("click", getSelection)
+						);
 					}
 				});
 				winner = true;
@@ -229,27 +211,18 @@ function checkIfPlayerWon() {
  */
 function checkIfTie() {
 	if (spotsPlayed.length == 9 && !gameStatus.includes("") && winner == false) {
-		swal({
+		Swal.fire({
 			title: "Tie Game",
-			icon: "./img/tie.png",
-			buttons: {
-				okay: "Ok",
-				newGame: "New Game",
-			},
-		}).then((value) => {
-			switch (value) {
-				case "newGame":
-					setUpNewGame();
-					break;
-				case "okay":
-					all.forEach((element) =>
-						element.removeEventListener("click", getSelection)
-					);
-					break;
-				default:
-					all.forEach((element) =>
-						element.removeEventListener("click", getSelection)
-					);
+			imageUrl: "./img/tie.png",
+			showCancelButton: true,
+			confirmButtonText: "New Game",
+		}).then((result) => {
+			if (result.isConfirmed) {
+				setUpNewGame();
+			} else {
+				all.forEach((element) =>
+					element.removeEventListener("click", getSelection)
+				);
 			}
 		});
 	}
