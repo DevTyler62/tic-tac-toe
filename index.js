@@ -58,20 +58,12 @@ all.forEach((element, index) =>
 );
 
 /**
+ * @param index number - Carries the index of the spot that the user has selected
  * Get the spot on the board that the user has selected
  */
 function getSelection(index) {
-  console.log(boardLocked);
   if (boardLocked) return;
   checkSelection(index);
-  //   for (let i = 0; i <= 8; i++) {
-  //     if (boardLocked) return;
-
-  //     if (all[i].checked === true) {
-  //       checkSelection(i);
-  //       break;
-  //     }
-  //   }
 }
 /**
  * Validates the spot that the user selected to make sure it is free to be used
@@ -82,6 +74,7 @@ function checkSelection(i) {
   makeMove(i);
 }
 /**
+ * @param index number - Carries the index of the spot that the user has selected
  * Handles the changing of the player
  */
 function makeMove(index) {
@@ -103,7 +96,6 @@ function makeMove(index) {
     player = player === "X" ? "O" : "X";
     document.getElementById("player").textContent = player;
   }
-  console.log(player);
 }
 
 /**
@@ -122,6 +114,7 @@ function renderBoard() {
   }
 }
 /**
+ * @param player string - Carries the current player that is being checked for a win
  * Checks the current status of the game to see if a player has won or not
  */
 function checkIfPlayerWon(player) {
@@ -246,6 +239,7 @@ function computerPlayer() {
 }
 
 /**
+ * @param index number - Carries the index of the spot that the computer has selected
  * Runs the computer move
  */
 function computerMove(index) {
@@ -327,11 +321,8 @@ function randomPick() {
  */
 function lockBoard() {
   boardLocked = true;
-  //   all.forEach((slot) => (slot.checked = true));
 }
 
 function unlockBoard() {
-  console.log("unlock");
   boardLocked = false;
-  //   all.forEach((slot) => (slot.checked = false));
 }
