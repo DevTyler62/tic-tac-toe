@@ -4,7 +4,7 @@
 
 let player = "X";
 let boardLocked = false;
-//var spotsPlayed = [];
+
 var xspots = [
   "xone",
   "xtwo",
@@ -53,24 +53,25 @@ let restart = document.getElementById("restart");
 restart.addEventListener("click", setUpNewGame);
 
 let all = document.querySelectorAll(".slot");
-all.forEach((element) => element.addEventListener("click", getSelection));
+all.forEach((element, index) =>
+  element.addEventListener("click", () => getSelection(index))
+);
 
 /**
  * Get the spot on the board that the user has selected
  */
-function getSelection() {
+function getSelection(index) {
   console.log(boardLocked);
-  for (let i = 0; i <= 8; i++) {
-    if (boardLocked) return;
-    // if (player === "computer") {
-    //   // Do noting till the computer has picked its spot
-    // } else {
-    if (all[i].checked === true) {
-      checkSelection(i);
-      break;
-    }
-    // }
-  }
+  if (boardLocked) return;
+  checkSelection(index);
+  //   for (let i = 0; i <= 8; i++) {
+  //     if (boardLocked) return;
+
+  //     if (all[i].checked === true) {
+  //       checkSelection(i);
+  //       break;
+  //     }
+  //   }
 }
 /**
  * Validates the spot that the user selected to make sure it is free to be used
@@ -79,14 +80,6 @@ function getSelection() {
 function checkSelection(i) {
   if (gameStatus[i] !== "") return;
   makeMove(i);
-  //   handlePlayer(i);
-  //   let exists = spotsPlayed.find((e) => e === i);
-  //   if (typeof exists == "number") {
-  //     /* Do nothing as the number has already been selected */
-  //   } else {
-  //     spotsPlayed.push(i);
-  //     handlePlayer(i);
-  //   }
 }
 /**
  * Handles the changing of the player
@@ -110,59 +103,9 @@ function makeMove(index) {
     player = player === "X" ? "O" : "X";
     document.getElementById("player").textContent = player;
   }
+  console.log(player);
 }
-/**
- * Handles the changing of the player
- * @param i number - Carries the number of the spot in which the user selected
- */
-// function handlePlayer(i) {
-//   if (player === "x" && computer === false) {
-//     // xspot(i);
-//     gameStatus[i] = "X";
-//     renderBoard();
-//     checkIfPlayerWon();
-//     checkIfTie();
-//     player = "o";
-//     document.getElementById("player").textContent = "O";
-//   } else if (player === "o" && computer === false) {
-//     // ospot(i);
-//     gameStatus[i] = "O";
-//     renderBoard();
-//     checkIfPlayerWon();
-//     checkIfTie();
-//     player = "x";
-//     document.getElementById("player").textContent = "X";
-//   }
 
-//   if (player === "x" && computer === true) {
-//     // all.forEach((element) => element.removeEventListener("click", () => {}));
-//     // xspot(i);
-//     gameStatus[i] = "X";
-//     renderBoard();
-//     checkIfPlayerWon();
-//     checkIfTie();
-//     player = "computer";
-//     document.getElementById("player").textContent = "Computer";
-//     setTimeout(function () {
-//       if (player === "computer") {
-//         if (winner === false) {
-//           computerPlayer(i);
-//           setTimeout(function () {
-//             checkIfPlayerWon();
-//             checkIfTie();
-//             document.getElementById("player").textContent = "X";
-//             player = "x";
-//             // all.forEach((element) =>
-//             // 	element.addEventListener("click", getSelection)
-//             // );
-//           }, 3000);
-//         } else if (winner === true) {
-//           // Do nothing as there has been a winner found
-//         }
-//       }
-//     }, 1000);
-//   }
-// }
 /**
  * Render the board with the X and O images based on the user selection
  */
@@ -178,32 +121,6 @@ function renderBoard() {
     }
   }
 }
-/**
- * Marks the spot selected with a X
- * @param i number - Carries the number of the spot in which the user selected
- */
-// function xspot(i) {
-//   for (let j = 0; j <= 8; j++) {
-//     if (j === i) {
-//       document.getElementById(xspots[j]).style.visibility = "visible";
-//       document.getElementById(ospots[j]).style.visibility = "hidden";
-//       gameStatus[i] = "X";
-//     }
-//   }
-// }
-/**
- * Marks the spot selected with a O
- * @param i number - Carries the number of the spot in which the user selected
- */
-// function ospot(i) {
-//   for (let j = 0; j <= 8; j++) {
-//     if (j === i) {
-//       document.getElementById(xspots[j]).style.visibility = "hidden";
-//       document.getElementById(ospots[j]).style.visibility = "visible";
-//       gameStatus[i] = "O";
-//     }
-//   }
-// }
 /**
  * Checks the current status of the game to see if a player has won or not
  */
@@ -237,7 +154,7 @@ function checkIfPlayerWon(player) {
         });
         winner = true;
       }
-      if (player === "O" || player === "computer") {
+      if (player === "O") {
         Swal.fire({
           title: "O Won the Game",
           imageUrl: "./img/celebration.png",
@@ -284,22 +201,6 @@ function checkIfTie() {
  */
 function setUpNewGame() {
   gameStatus.fill("");
-  //   for (let r = 0; r < spotsPlayed.length; r++) {
-  //     const found = gameStatus[spotsPlayed[r]];
-  //     if (found === "X") {
-  //       document.getElementById(xspots[spotsPlayed[r]]).style.visibility =
-  //         "hidden";
-  //     } else if (found === "O") {
-  //       document.getElementById(ospots[spotsPlayed[r]]).style.visibility =
-  //         "hidden";
-  //     }
-  //   }
-  //   for (let t = 0; t < gameStatus.length; t++) {
-  //     if (gameStatus[t] !== "") {
-  //       gameStatus[t] = "";
-  //     }
-  //   }
-  //spotsPlayed = [];
   player = "X";
   window.location.reload();
 }
@@ -309,11 +210,6 @@ function setUpNewGame() {
  */
 function twoPlayer() {
   setUpNewGame();
-  //   for (let i = 0; i < spotsPlayed.length; i++) {
-  //     if (spotsPlayed[i] !== null) {
-  //       setUpNewGame();
-  //     }
-  //   }
 }
 
 /*--------------------------*/
@@ -364,14 +260,6 @@ function computerMove(index) {
   player = "X";
   document.getElementById("player").textContent = "X";
 }
-/**
- * Function for picking the first spot for the computer
- * (Not a necessary function as it can just be called in the switch statement, kept in for better read ability
- * same for functions 3 and 4 as well)
- */
-// function pickSpot1() {
-//   randomPick();
-// }
 
 /**
  * Function for picking the second spot for the computer
@@ -399,13 +287,7 @@ function pickSpot2() {
             // call to make a random pick since above condition was met
             randomPick();
           } else {
-            // ospot(c);
             computerMove(c);
-            //gameStatus[c] = "O";
-            //renderBoard();
-            //renderBoard();
-            //makeMove(c, "O");
-            // spotsPlayed.push(c);
           }
         }, 2000);
       } else if (c === xarray[0] || c === xarray[1]) {
@@ -415,12 +297,7 @@ function pickSpot2() {
             // call to make a random pick since above conditon was met
             randomPick();
           } else {
-            // ospot(b);
             computerMove(b);
-            //gameStatus[b] = "O";
-            //renderBoard();
-            // makeMove(b, "O");
-            //spotsPlayed.push(b);
           }
         }, 2000);
       }
@@ -432,34 +309,13 @@ function pickSpot2() {
 }
 
 /**
- * Function for picking spot 3 for the computer
- */
-// function pickSpot3() {
-//   randomPick();
-// }
-
-// /**
-//  * Function for picking spot 4 for the computer
-//  */
-// function pickSpot4() {
-//   randomPick();
-// }
-
-/**
  * Finding a random spot on the board that is open to be selected for the computer
  */
 function randomPick() {
   let pick = Math.floor(Math.random() * 9);
-  //let taken = spotsPlayed.find((p) => p === pick);
   if (gameStatus[pick] === "") {
     setTimeout(function () {
-      //   ospot(pick);
-      //gameStatus[pick] = "O";
       computerMove(pick);
-      //makeMove(pick, "O");
-      //   renderBoard();
-      //   spotsPlayed.push(pick);
-      //gameStatus.push(pick);
     }, 2000);
   } else {
     randomPick();
@@ -471,11 +327,11 @@ function randomPick() {
  */
 function lockBoard() {
   boardLocked = true;
-  all.forEach((slot) => (slot.checked = true));
+  //   all.forEach((slot) => (slot.checked = true));
 }
 
 function unlockBoard() {
   console.log("unlock");
   boardLocked = false;
-  all.forEach((slot) => (slot.checked = false));
+  //   all.forEach((slot) => (slot.checked = false));
 }
