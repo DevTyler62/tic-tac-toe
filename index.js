@@ -2,7 +2,8 @@
  * Global variabale declerations
  */
 
-var player = "x";
+let player = "X";
+let boardLocked = false;
 //var spotsPlayed = [];
 var xspots = [
   "xone",
@@ -58,14 +59,17 @@ all.forEach((element) => element.addEventListener("click", getSelection));
  * Get the spot on the board that the user has selected
  */
 function getSelection() {
+  console.log(boardLocked);
   for (let i = 0; i <= 8; i++) {
-    if (player === "computer") {
-      // Do noting till the computer has picked its spot
-    } else {
-      if (all[i].checked === true) {
-        checkSelection(i);
-      }
+    if (boardLocked) return;
+    // if (player === "computer") {
+    //   // Do noting till the computer has picked its spot
+    // } else {
+    if (all[i].checked === true) {
+      checkSelection(i);
+      break;
     }
+    // }
   }
 }
 /**
@@ -74,8 +78,8 @@ function getSelection() {
  */
 function checkSelection(i) {
   if (gameStatus[i] !== "") return;
-
-  handlePlayer(i);
+  makeMove(i);
+  //   handlePlayer(i);
   //   let exists = spotsPlayed.find((e) => e === i);
   //   if (typeof exists == "number") {
   //     /* Do nothing as the number has already been selected */
@@ -86,56 +90,79 @@ function checkSelection(i) {
 }
 /**
  * Handles the changing of the player
- * @param i number - Carries the number of the spot in which the user selected
  */
-function handlePlayer(i) {
-  if (player === "x" && computer === false) {
-    // xspot(i);
-    gameStatus[i] = "X";
-    renderBoard();
-    checkIfPlayerWon();
-    checkIfTie();
-    player = "o";
-    document.getElementById("player").textContent = "O";
-  } else if (player === "o" && computer === false) {
-    // ospot(i);
-    gameStatus[i] = "O";
-    renderBoard();
-    checkIfPlayerWon();
-    checkIfTie();
-    player = "x";
-    document.getElementById("player").textContent = "X";
-  }
+function makeMove(index) {
+  gameStatus[index] = player;
 
-  if (player === "x" && computer === true) {
-    // all.forEach((element) => element.removeEventListener("click", () => {}));
-    // xspot(i);
-    gameStatus[i] = "X";
-    renderBoard();
-    checkIfPlayerWon();
-    checkIfTie();
-    player = "computer";
+  renderBoard();
+
+  if (checkIfPlayerWon(player)) return;
+  if (checkIfTie()) return;
+
+  if (computer && player === "X") {
+    lockBoard();
+    player = "O";
+
     document.getElementById("player").textContent = "Computer";
-    setTimeout(function () {
-      if (player === "computer") {
-        if (winner === false) {
-          computerPlayer(i);
-          setTimeout(function () {
-            checkIfPlayerWon();
-            checkIfTie();
-            document.getElementById("player").textContent = "X";
-            player = "x";
-            // all.forEach((element) =>
-            // 	element.addEventListener("click", getSelection)
-            // );
-          }, 3000);
-        } else if (winner === true) {
-          // Do nothing as there has been a winner found
-        }
-      }
-    }, 1000);
+
+    setTimeout(computerPlayer, 1000);
+  } else {
+    player = player === "X" ? "O" : "X";
+    document.getElementById("player").textContent = player;
   }
 }
+/**
+ * Handles the changing of the player
+ * @param i number - Carries the number of the spot in which the user selected
+ */
+// function handlePlayer(i) {
+//   if (player === "x" && computer === false) {
+//     // xspot(i);
+//     gameStatus[i] = "X";
+//     renderBoard();
+//     checkIfPlayerWon();
+//     checkIfTie();
+//     player = "o";
+//     document.getElementById("player").textContent = "O";
+//   } else if (player === "o" && computer === false) {
+//     // ospot(i);
+//     gameStatus[i] = "O";
+//     renderBoard();
+//     checkIfPlayerWon();
+//     checkIfTie();
+//     player = "x";
+//     document.getElementById("player").textContent = "X";
+//   }
+
+//   if (player === "x" && computer === true) {
+//     // all.forEach((element) => element.removeEventListener("click", () => {}));
+//     // xspot(i);
+//     gameStatus[i] = "X";
+//     renderBoard();
+//     checkIfPlayerWon();
+//     checkIfTie();
+//     player = "computer";
+//     document.getElementById("player").textContent = "Computer";
+//     setTimeout(function () {
+//       if (player === "computer") {
+//         if (winner === false) {
+//           computerPlayer(i);
+//           setTimeout(function () {
+//             checkIfPlayerWon();
+//             checkIfTie();
+//             document.getElementById("player").textContent = "X";
+//             player = "x";
+//             // all.forEach((element) =>
+//             // 	element.addEventListener("click", getSelection)
+//             // );
+//           }, 3000);
+//         } else if (winner === true) {
+//           // Do nothing as there has been a winner found
+//         }
+//       }
+//     }, 1000);
+//   }
+// }
 /**
  * Render the board with the X and O images based on the user selection
  */
@@ -180,7 +207,7 @@ function renderBoard() {
 /**
  * Checks the current status of the game to see if a player has won or not
  */
-function checkIfPlayerWon() {
+function checkIfPlayerWon(player) {
   for (let p = 0; p <= 7; p++) {
     const winCondition = winningConditions[p];
 
@@ -193,7 +220,7 @@ function checkIfPlayerWon() {
     }
 
     if (a === b && b === c) {
-      if (player === "x") {
+      if (player === "X") {
         Swal.fire({
           title: "X Won the Game",
           imageUrl: "./img/celebration.png",
@@ -210,7 +237,7 @@ function checkIfPlayerWon() {
         });
         winner = true;
       }
-      if (player === "o" || player === "computer") {
+      if (player === "O" || player === "computer") {
         Swal.fire({
           title: "O Won the Game",
           imageUrl: "./img/celebration.png",
@@ -273,7 +300,7 @@ function setUpNewGame() {
   //     }
   //   }
   //spotsPlayed = [];
-  player = "x";
+  player = "X";
   window.location.reload();
 }
 
@@ -307,29 +334,44 @@ function computerPlayer() {
   let occurrences = gameStatus.reduce((a, v) => (v === "O" ? a + 1 : a), 0);
   switch (occurrences) {
     case 0:
-      pickSpot1();
+      randomPick(); //move one
       break;
     case 1:
-      pickSpot2();
+      pickSpot2(); // move two
       break;
     case 2:
-      pickSpot3();
+      randomPick(); // move three
       break;
     case 3:
-      pickSpot4();
+      randomPick(); // move four
       break;
     default:
   }
 }
 
 /**
+ * Runs the computer move
+ */
+function computerMove(index) {
+  gameStatus[index] = "O";
+
+  renderBoard();
+
+  if (checkIfPlayerWon("O")) return;
+  if (checkIfTie()) return;
+
+  unlockBoard();
+  player = "X";
+  document.getElementById("player").textContent = "X";
+}
+/**
  * Function for picking the first spot for the computer
  * (Not a necessary function as it can just be called in the switch statement, kept in for better read ability
  * same for functions 3 and 4 as well)
  */
-function pickSpot1() {
-  randomPick();
-}
+// function pickSpot1() {
+//   randomPick();
+// }
 
 /**
  * Function for picking the second spot for the computer
@@ -358,7 +400,11 @@ function pickSpot2() {
             randomPick();
           } else {
             // ospot(c);
-            renderBoard();
+            computerMove(c);
+            //gameStatus[c] = "O";
+            //renderBoard();
+            //renderBoard();
+            //makeMove(c, "O");
             // spotsPlayed.push(c);
           }
         }, 2000);
@@ -370,7 +416,10 @@ function pickSpot2() {
             randomPick();
           } else {
             // ospot(b);
-            renderBoard();
+            computerMove(b);
+            //gameStatus[b] = "O";
+            //renderBoard();
+            // makeMove(b, "O");
             //spotsPlayed.push(b);
           }
         }, 2000);
@@ -385,16 +434,16 @@ function pickSpot2() {
 /**
  * Function for picking spot 3 for the computer
  */
-function pickSpot3() {
-  randomPick();
-}
+// function pickSpot3() {
+//   randomPick();
+// }
 
-/**
- * Function for picking spot 4 for the computer
- */
-function pickSpot4() {
-  randomPick();
-}
+// /**
+//  * Function for picking spot 4 for the computer
+//  */
+// function pickSpot4() {
+//   randomPick();
+// }
 
 /**
  * Finding a random spot on the board that is open to be selected for the computer
@@ -405,12 +454,28 @@ function randomPick() {
   if (gameStatus[pick] === "") {
     setTimeout(function () {
       //   ospot(pick);
-      gameStatus[i] = "O";
-      renderBoard();
+      //gameStatus[pick] = "O";
+      computerMove(pick);
+      //makeMove(pick, "O");
+      //   renderBoard();
       //   spotsPlayed.push(pick);
       //gameStatus.push(pick);
     }, 2000);
   } else {
     randomPick();
   }
+}
+
+/**
+ * Helper functions for disabling and enabling the board when the computer is playing
+ */
+function lockBoard() {
+  boardLocked = true;
+  all.forEach((slot) => (slot.checked = true));
+}
+
+function unlockBoard() {
+  console.log("unlock");
+  boardLocked = false;
+  all.forEach((slot) => (slot.checked = false));
 }
