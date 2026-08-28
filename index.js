@@ -1,5 +1,5 @@
 /**
- * Global variabale declerations
+ * Global variable declarations
  */
 
 let player = "X";
@@ -119,55 +119,76 @@ function renderBoard() {
  * @param player string - Carries the current player that is being checked for a win
  * Checks the current status of the game to see if a player has won or not
  */
+// function checkIfPlayerWon(player) {
+//   for (let p = 0; p <= 7; p++) {
+//     const winCondition = winningConditions[p];
+
+//     let a = gameStatus[winCondition[0]];
+//     let b = gameStatus[winCondition[1]];
+//     let c = gameStatus[winCondition[2]];
+
+//     if (a === "" || b === "" || c === "") {
+//       continue;
+//     }
+
+//     if (a === b && b === c) {
+//       if (player === "X") {
+//         Swal.fire({
+//           title: "X Won the Game",
+//           imageUrl: "./img/celebration.png",
+//           showCancelButton: true,
+//           confirmButtonText: "New Game",
+//         }).then((result) => {
+//           if (result.isConfirmed) {
+//             setUpNewGame();
+//           } else {
+//             all.forEach((element) =>
+//               element.removeEventListener("click", getSelection)
+//             );
+//           }
+//         });
+//         winner = true;
+//       }
+//       if (player === "O") {
+//         Swal.fire({
+//           title: "O Won the Game",
+//           imageUrl: "./img/celebration.png",
+//           showCancelButton: true,
+//           confirmButtonText: "New Game",
+//         }).then((result) => {
+//           if (result.isConfirmed) {
+//             setUpNewGame();
+//           } else {
+//             all.forEach((element) =>
+//               element.removeEventListener("click", getSelection)
+//             );
+//           }
+//         });
+//         winner = true;
+//       }
+//     }
+//   }
+// }
 function checkIfPlayerWon(player) {
-  for (let p = 0; p <= 7; p++) {
-    const winCondition = winningConditions[p];
-
-    let a = gameStatus[winCondition[0]];
-    let b = gameStatus[winCondition[1]];
-    let c = gameStatus[winCondition[2]];
-
-    if (a === "" || b === "" || c === "") {
-      continue;
-    }
-
-    if (a === b && b === c) {
-      if (player === "X") {
-        Swal.fire({
-          title: "X Won the Game",
-          imageUrl: "./img/celebration.png",
-          showCancelButton: true,
-          confirmButtonText: "New Game",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            setUpNewGame();
-          } else {
-            all.forEach((element) =>
-              element.removeEventListener("click", getSelection)
-            );
-          }
-        });
-        winner = true;
-      }
-      if (player === "O") {
-        Swal.fire({
-          title: "O Won the Game",
-          imageUrl: "./img/celebration.png",
-          showCancelButton: true,
-          confirmButtonText: "New Game",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            setUpNewGame();
-          } else {
-            all.forEach((element) =>
-              element.removeEventListener("click", getSelection)
-            );
-          }
-        });
-        winner = true;
-      }
-    }
+  if (!checkWinner(gameStatus, player)) {
+    return false;
   }
+
+  winner = true;
+  lockBoard();
+
+  Swal.fire({
+    title: `${player} Won the Game`,
+    imageUrl: "./img/celebration.png",
+    showCancelButton: true,
+    confirmButtonText: "New Game",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      setUpNewGame();
+    }
+  });
+
+  return true;
 }
 /**
  * Different win check function
@@ -197,11 +218,12 @@ function checkIfTie() {
     }).then((result) => {
       if (result.isConfirmed) {
         setUpNewGame();
-      } else {
-        all.forEach((element) =>
-          element.removeEventListener("click", getSelection)
-        );
       }
+      //   } else {
+      //     all.forEach((element) =>
+      //       element.removeEventListener("click", getSelection)
+      //     );
+      //   }
     });
     return true;
   }
@@ -214,13 +236,23 @@ function checkIfTie() {
 function setUpNewGame() {
   gameStatus.fill("");
   player = "X";
-  window.location.reload();
+  winner = false;
+  boardLocked = false;
+
+  renderBoard();
+
+  document.getElementById("player").textContent = "X";
+  //window.location.reload();
 }
 
 /**
  * If a game is being played and the user selects the "2 player" button again then it resets the game
  */
 function twoPlayer() {
+  computer = false;
+
+  document.getElementById("gametype").textContent = "2 Player";
+
   setUpNewGame();
 }
 
@@ -233,6 +265,7 @@ function twoPlayer() {
 function computerStart() {
   computer = true;
   document.getElementById("gametype").textContent = "Computer";
+  setUpNewGame();
 }
 
 /**
@@ -240,6 +273,8 @@ function computerStart() {
  */
 function computerPlayer() {
   let bestMove = getBestMove();
+
+  //   console.log("Computer chose:", bestMove);
 
   computerMove(bestMove);
   //   let occurrences = gameStatus.reduce((a, v) => (v === "O" ? a + 1 : a), 0);
@@ -310,7 +345,7 @@ function computerMove(index) {
 //         spotPicked = true;
 //         setTimeout(function () {
 //           if (gameStatus[b] === "O") {
-//             // call to make a random pick since above conditon was met
+//             // call to make a random pick since above condition was met
 //             randomPick();
 //           } else {
 //             computerMove(b);
@@ -374,10 +409,14 @@ function getAvailableMoves(board) {
 /**
  * Minimax algorithm for the computer to find the best move to make
  */
-function minimax(board, isMaximizing) {
-  if (checkWinner(board, AI)) return 10;
+function minimax(board, isMaximizing, depth) {
+  if (checkWinner(board, AI)) {
+    return 10 - depth;
+  }
 
-  if (checkWinner(board, HUMAN)) return -10;
+  if (checkWinner(board, HUMAN)) {
+    return depth - 10;
+  }
 
   if (boardFull(board)) return 0;
 
@@ -387,7 +426,7 @@ function minimax(board, isMaximizing) {
     for (const move of getAvailableMoves(board)) {
       board[move] = AI;
 
-      let score = minimax(board, false);
+      let score = minimax(board, false, depth + 1);
 
       board[move] = "";
 
@@ -401,7 +440,7 @@ function minimax(board, isMaximizing) {
     for (const move of getAvailableMoves(board)) {
       board[move] = HUMAN;
 
-      let score = minimax(board, true);
+      let score = minimax(board, true, depth + 1);
 
       board[move] = "";
 
@@ -423,7 +462,7 @@ function getBestMove() {
   for (const spot of getAvailableMoves(gameStatus)) {
     gameStatus[spot] = AI;
 
-    let score = minimax(gameStatus, false);
+    let score = minimax(gameStatus, false, 0);
 
     gameStatus[spot] = "";
 
