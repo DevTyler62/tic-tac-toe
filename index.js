@@ -62,8 +62,9 @@ all.forEach((element, index) =>
 );
 
 /**
- * @param index number - Carries the index of the spot that the user has selected
  * Get the spot on the board that the user has selected
+ * @param index number - Carries the index of the spot that the user has selected
+ * @returns - Returns nothing
  */
 function getSelection(index) {
   if (boardLocked) return;
@@ -78,8 +79,9 @@ function checkSelection(i) {
   makeMove(i);
 }
 /**
+ * Handles the user making a move on the board and checks if the user has won or if there is a tie
  * @param index number - Carries the index of the spot that the user has selected
- * Handles the changing of the player
+ * @returns - Returns true if the user has won, otherwise returns false
  */
 function makeMove(index) {
   gameStatus[index] = player;
@@ -118,6 +120,11 @@ function renderBoard() {
   }
 }
 
+/**
+ * Checks if a player has won the game and displays a message if they have
+ * @param player - Carries the player that is being checked for a win
+ * @returns - Returns true if the player has won, otherwise returns false
+ */
 function checkIfPlayerWon(player) {
   if (!checkWinner(gameStatus, player)) {
     return false;
@@ -140,7 +147,10 @@ function checkIfPlayerWon(player) {
   return true;
 }
 /**
- * Different win check function
+ * Checking if a player has won based on the winning conditions and the current state of the board
+ * @param board - Carries the current state of the board
+ * @param player - Carries the player that is being checked for a win
+ * @returns - Returns true if the player has won, otherwise returns false
  */
 function checkWinner(board, player) {
   for (const condition of winningConditions) {
@@ -156,6 +166,7 @@ function checkWinner(board, player) {
 
 /**
  * Checks if there is a tie in the game if no winner has been selected
+ * @returns - Returns true if there is a tie, otherwise returns false
  */
 function checkIfTie() {
   if (!gameStatus.includes("") && winner == false) {
@@ -211,7 +222,8 @@ function twoPlayer() {
 /* START COMPUTER CODE */
 
 /**
- * Initiates the starting of the computer code
+ * Initiates the starting of the computer code by showing the user difficulty options to select from
+ * and then calling the selectDifficulty function based on the user's selection
  */
 function computerStart() {
   Swal.fire({
@@ -233,6 +245,10 @@ function computerStart() {
   });
 }
 
+/**
+ * Setting the difficulty level for the computer and starting a new game
+ * @param level - Carries the difficulty level that the user has selected
+ */
 function selectDifficulty(level) {
   difficulty = level;
   computer = true;
@@ -242,12 +258,8 @@ function selectDifficulty(level) {
   setUpNewGame();
 }
 
-function capitalize(word) {
-  return word.charAt(0).toUpperCase() + word.slice(1);
-}
-
 /**
- * Runs the picking of the computer code
+ * Runs the computer player by first getting difficulty level and then getting the move that the computer will make based on the difficulty level
  */
 function computerPlayer() {
   let move;
@@ -269,6 +281,7 @@ function computerPlayer() {
 
 /**
  * Gets a random move for the computer to make - Used for easy difficulty
+ * @returns - Returns the index of the move that the computer will make
  */
 function getRandomMove() {
   let availableMoves = getAvailableMoves(gameStatus);
@@ -280,6 +293,7 @@ function getRandomMove() {
 
 /**
  * Medium difficulty move selection - tries to block the player from winning, otherwise picks a random move
+ * @returns - Returns the index of the move that the computer will make
  */
 function getMediumMove() {
   // Try to win
@@ -311,8 +325,9 @@ function getMediumMove() {
 }
 
 /**
+ * Handles the computer making a move on the board
  * @param index number - Carries the index of the spot that the computer has selected
- * Runs the computer move
+ * @returns - Returns true if the computer has won, otherwise returns false
  */
 function computerMove(index) {
   gameStatus[index] = "O";
@@ -328,25 +343,9 @@ function computerMove(index) {
 }
 
 /**
- * Helper functions for disabling and enabling the board when the computer is playing
- */
-function lockBoard() {
-  boardLocked = true;
-}
-
-function unlockBoard() {
-  boardLocked = false;
-}
-
-/**
- * checking if the board is full
- */
-function boardFull(board) {
-  return !board.includes("");
-}
-
-/**
  * Finding the best move for the computer to make
+ * @param board - Carries the current state of the board
+ * @returns - Returns an array of the available moves that can be made on the board
  */
 function getAvailableMoves(board) {
   let moves = [];
@@ -362,6 +361,10 @@ function getAvailableMoves(board) {
 
 /**
  * Minimax algorithm for the computer to find the best move to make
+ * @param board - Carries the current state of the board
+ * @param isMaximizing - Carries a boolean value to determine if the computer is maximizing or minimizing
+ * @param depth - Carries the depth of the recursion
+ * @returns - Returns the score of the current board state
  */
 function minimax(board, isMaximizing, depth) {
   if (checkWinner(board, AI)) {
@@ -406,7 +409,8 @@ function minimax(board, isMaximizing, depth) {
 }
 
 /**
- * Getting the best move
+ * Getting the best move for the computer to make based on the minimax algorithm
+ * @returns - Returns the index of the best move for the computer to make
  */
 function getBestMove() {
   let bestScore = -Infinity;
@@ -427,4 +431,36 @@ function getBestMove() {
   }
 
   return move;
+}
+
+/*----------------------------*/
+/* End Computer Code */
+
+/**
+ * Helper functions for disabling and enabling the board when the computer is playing
+ */
+function lockBoard() {
+  boardLocked = true;
+}
+
+function unlockBoard() {
+  boardLocked = false;
+}
+
+/**
+ * checking if the board is full
+ * @param board - Carries the current state of the board
+ * @returns - Returns true if the board is full, otherwise returns false
+ */
+function boardFull(board) {
+  return !board.includes("");
+}
+
+/**
+ *
+ * @param word - Carries the word that needs to be capitalized
+ * @returns - Returns the word with the first letter capitalized
+ */
+function capitalize(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
 }
