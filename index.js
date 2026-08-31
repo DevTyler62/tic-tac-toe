@@ -6,6 +6,8 @@ let player = "X";
 let boardLocked = false;
 let HUMAN = "X";
 let AI = "O";
+let difficulty = "easy";
+let computerTimeout;
 
 var xspots = [
   "xone",
@@ -93,7 +95,7 @@ function makeMove(index) {
 
     document.getElementById("player").textContent = "Computer";
 
-    setTimeout(computerPlayer, 1000);
+    computerTimeout = setTimeout(computerPlayer, 1000);
   } else {
     player = player === "X" ? "O" : "X";
     document.getElementById("player").textContent = player;
@@ -210,6 +212,7 @@ function checkWinner(board, player) {
  */
 function checkIfTie() {
   if (!gameStatus.includes("") && winner == false) {
+    lockBoard();
     Swal.fire({
       title: "Tie Game",
       imageUrl: "./img/tie.png",
@@ -234,6 +237,11 @@ function checkIfTie() {
  * Sets up a new game to be played
  */
 function setUpNewGame() {
+  if (computerTimeout) {
+    clearTimeout(computerTimeout);
+    computerTimeout = null;
+  }
+
   gameStatus.fill("");
   player = "X";
   winner = false;
@@ -250,8 +258,10 @@ function setUpNewGame() {
  */
 function twoPlayer() {
   computer = false;
+  difficulty = "";
 
   document.getElementById("gametype").textContent = "2 Player";
+  document.getElementById("difficulty").textContent = "—";
 
   setUpNewGame();
 }
@@ -263,20 +273,63 @@ function twoPlayer() {
  * Initiates the starting of the computer code
  */
 function computerStart() {
+  //   computer = true;
+  //   document.getElementById("gametype").textContent = "Computer";
+  //   setUpNewGame();
+  Swal.fire({
+    title: "Select Difficulty",
+    text: "Choose how challenging you want the computer to be.",
+    showDenyButton: true,
+    showCancelButton: true,
+    confirmButtonText: "Easy",
+    denyButtonText: "Medium",
+    cancelButtonText: "Hard",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      selectDifficulty("easy");
+    } else if (result.isDenied) {
+      selectDifficulty("medium");
+    } else if (result.dismiss === Swal.DismissReason.cancel) {
+      selectDifficulty("hard");
+    }
+  });
+}
+
+function selectDifficulty(level) {
+  difficulty = level;
   computer = true;
+
   document.getElementById("gametype").textContent = "Computer";
+  document.getElementById("difficulty").textContent = `${capitalize(level)}`;
   setUpNewGame();
+}
+
+function capitalize(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
 /**
  * Runs the picking of the computer code
  */
 function computerPlayer() {
-  let bestMove = getBestMove();
+  let move;
+
+  if (difficulty === "easy") {
+    move = getRandomMove();
+  } else if (difficulty === "medium") {
+    move = getMediumMove();
+  } else if (difficulty === "hard") {
+    move = getBestMove();
+  }
+
+  if (move === undefined || move === -1) {
+    return;
+  }
+  //   let bestMove = getBestMove();
 
   //   console.log("Computer chose:", bestMove);
 
-  computerMove(bestMove);
+  computerMove(move);
   //   let occurrences = gameStatus.reduce((a, v) => (v === "O" ? a + 1 : a), 0);
   //   switch (occurrences) {
   //     case 0:
@@ -293,6 +346,49 @@ function computerPlayer() {
   //       break;
   //     default:
   //   }
+}
+
+/**
+ * Gets a random move for the computer to make - Used for easy difficulty
+ */
+function getRandomMove() {
+  let availableMoves = getAvailableMoves(gameStatus);
+
+  let randomIndex = Math.floor(Math.random() * availableMoves.length);
+
+  return availableMoves[randomIndex];
+}
+
+/**
+ * Medium difficulty move selection - tries to block the player from winning, otherwise picks a random move
+ */
+function getMediumMove() {
+  // Try to win
+  for (const move of getAvailableMoves(gameStatus)) {
+    gameStatus[move] = AI;
+
+    if (checkWinner(gameStatus, AI)) {
+      gameStatus[move] = "";
+      return move;
+    }
+
+    gameStatus[move] = "";
+  }
+
+  // Try to block the player
+  for (const move of getAvailableMoves(gameStatus)) {
+    gameStatus[move] = HUMAN;
+
+    if (checkWinner(gameStatus, HUMAN)) {
+      gameStatus[move] = "";
+      return move;
+    }
+
+    gameStatus[move] = "";
+  }
+
+  // Otherwise make a random move
+  return getRandomMove();
 }
 
 /**
