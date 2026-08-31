@@ -117,60 +117,7 @@ function renderBoard() {
     }
   }
 }
-/**
- * @param player string - Carries the current player that is being checked for a win
- * Checks the current status of the game to see if a player has won or not
- */
-// function checkIfPlayerWon(player) {
-//   for (let p = 0; p <= 7; p++) {
-//     const winCondition = winningConditions[p];
 
-//     let a = gameStatus[winCondition[0]];
-//     let b = gameStatus[winCondition[1]];
-//     let c = gameStatus[winCondition[2]];
-
-//     if (a === "" || b === "" || c === "") {
-//       continue;
-//     }
-
-//     if (a === b && b === c) {
-//       if (player === "X") {
-//         Swal.fire({
-//           title: "X Won the Game",
-//           imageUrl: "./img/celebration.png",
-//           showCancelButton: true,
-//           confirmButtonText: "New Game",
-//         }).then((result) => {
-//           if (result.isConfirmed) {
-//             setUpNewGame();
-//           } else {
-//             all.forEach((element) =>
-//               element.removeEventListener("click", getSelection)
-//             );
-//           }
-//         });
-//         winner = true;
-//       }
-//       if (player === "O") {
-//         Swal.fire({
-//           title: "O Won the Game",
-//           imageUrl: "./img/celebration.png",
-//           showCancelButton: true,
-//           confirmButtonText: "New Game",
-//         }).then((result) => {
-//           if (result.isConfirmed) {
-//             setUpNewGame();
-//           } else {
-//             all.forEach((element) =>
-//               element.removeEventListener("click", getSelection)
-//             );
-//           }
-//         });
-//         winner = true;
-//       }
-//     }
-//   }
-// }
 function checkIfPlayerWon(player) {
   if (!checkWinner(gameStatus, player)) {
     return false;
@@ -222,11 +169,6 @@ function checkIfTie() {
       if (result.isConfirmed) {
         setUpNewGame();
       }
-      //   } else {
-      //     all.forEach((element) =>
-      //       element.removeEventListener("click", getSelection)
-      //     );
-      //   }
     });
     return true;
   }
@@ -250,7 +192,6 @@ function setUpNewGame() {
   renderBoard();
 
   document.getElementById("player").textContent = "X";
-  //window.location.reload();
 }
 
 /**
@@ -273,9 +214,6 @@ function twoPlayer() {
  * Initiates the starting of the computer code
  */
 function computerStart() {
-  //   computer = true;
-  //   document.getElementById("gametype").textContent = "Computer";
-  //   setUpNewGame();
   Swal.fire({
     title: "Select Difficulty",
     text: "Choose how challenging you want the computer to be.",
@@ -325,27 +263,8 @@ function computerPlayer() {
   if (move === undefined || move === -1) {
     return;
   }
-  //   let bestMove = getBestMove();
-
-  //   console.log("Computer chose:", bestMove);
 
   computerMove(move);
-  //   let occurrences = gameStatus.reduce((a, v) => (v === "O" ? a + 1 : a), 0);
-  //   switch (occurrences) {
-  //     case 0:
-  //       randomPick(); //move one
-  //       break;
-  //     case 1:
-  //       pickSpot2(); // move two
-  //       break;
-  //     case 2:
-  //       randomPick(); // move three
-  //       break;
-  //     case 3:
-  //       randomPick(); // move four
-  //       break;
-  //     default:
-  //   }
 }
 
 /**
@@ -407,67 +326,6 @@ function computerMove(index) {
   player = "X";
   document.getElementById("player").textContent = "X";
 }
-
-/**
- * Function for picking the second spot for the computer
- */
-// function pickSpot2() {
-//   let spotPicked = false;
-//   let xarray = [];
-//   for (let m = 0; m < gameStatus.length; m++) {
-//     if (gameStatus[m] === "X") {
-//       xarray.push(m);
-//     }
-//   }
-//   for (let p = 0; p <= 7; p++) {
-//     const winCondition = winningConditions[p];
-
-//     let a = winCondition[0];
-//     let b = winCondition[1];
-//     let c = winCondition[2];
-
-//     if (a === xarray[0] || a === xarray[1]) {
-//       if (b === xarray[0] || b === xarray[1]) {
-//         spotPicked = true;
-//         setTimeout(function () {
-//           if (gameStatus[c] === "O") {
-//             // call to make a random pick since above condition was met
-//             randomPick();
-//           } else {
-//             computerMove(c);
-//           }
-//         }, 2000);
-//       } else if (c === xarray[0] || c === xarray[1]) {
-//         spotPicked = true;
-//         setTimeout(function () {
-//           if (gameStatus[b] === "O") {
-//             // call to make a random pick since above condition was met
-//             randomPick();
-//           } else {
-//             computerMove(b);
-//           }
-//         }, 2000);
-//       }
-//     }
-//   }
-//   if (spotPicked === false) {
-//     randomPick();
-//   }
-// }
-
-/**
- * Finding a random spot on the board that is open to be selected for the computer
- */
-// function randomPick() {
-//   let pick = Math.floor(Math.random() * 9);
-//   if (gameStatus[pick] === "") {
-//     setTimeout(function () {
-//       computerMove(pick);
-//     }, 2000);
-//   } else {
-//     randomPick();
-//   }
-// }
 
 /**
  * Helper functions for disabling and enabling the board when the computer is playing
