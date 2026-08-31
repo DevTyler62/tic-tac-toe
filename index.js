@@ -1,9 +1,13 @@
 /**
- * Global variabale declerations
+ * Global variable declarations
  */
 
 let player = "X";
 let boardLocked = false;
+let HUMAN = "X";
+let AI = "O";
+let difficulty = "easy";
+let computerTimeout;
 
 var xspots = [
   "xone",
@@ -58,8 +62,9 @@ all.forEach((element, index) =>
 );
 
 /**
- * @param index number - Carries the index of the spot that the user has selected
  * Get the spot on the board that the user has selected
+ * @param index number - Carries the index of the spot that the user has selected
+ * @returns - Returns nothing
  */
 function getSelection(index) {
   if (boardLocked) return;
@@ -74,8 +79,9 @@ function checkSelection(i) {
   makeMove(i);
 }
 /**
+ * Handles the user making a move on the board and checks if the user has won or if there is a tie
  * @param index number - Carries the index of the spot that the user has selected
- * Handles the changing of the player
+ * @returns - Returns true if the user has won, otherwise returns false
  */
 function makeMove(index) {
   gameStatus[index] = player;
@@ -91,7 +97,7 @@ function makeMove(index) {
 
     document.getElementById("player").textContent = "Computer";
 
-    setTimeout(computerPlayer, 1000);
+    computerTimeout = setTimeout(computerPlayer, 1000);
   } else {
     player = player === "X" ? "O" : "X";
     document.getElementById("player").textContent = player;
@@ -113,65 +119,58 @@ function renderBoard() {
     }
   }
 }
+
 /**
- * @param player string - Carries the current player that is being checked for a win
- * Checks the current status of the game to see if a player has won or not
+ * Checks if a player has won the game and displays a message if they have
+ * @param player - Carries the player that is being checked for a win
+ * @returns - Returns true if the player has won, otherwise returns false
  */
 function checkIfPlayerWon(player) {
-  for (let p = 0; p <= 7; p++) {
-    const winCondition = winningConditions[p];
-
-    let a = gameStatus[winCondition[0]];
-    let b = gameStatus[winCondition[1]];
-    let c = gameStatus[winCondition[2]];
-
-    if (a === "" || b === "" || c === "") {
-      continue;
-    }
-
-    if (a === b && b === c) {
-      if (player === "X") {
-        Swal.fire({
-          title: "X Won the Game",
-          imageUrl: "./img/celebration.png",
-          showCancelButton: true,
-          confirmButtonText: "New Game",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            setUpNewGame();
-          } else {
-            all.forEach((element) =>
-              element.removeEventListener("click", getSelection)
-            );
-          }
-        });
-        winner = true;
-      }
-      if (player === "O") {
-        Swal.fire({
-          title: "O Won the Game",
-          imageUrl: "./img/celebration.png",
-          showCancelButton: true,
-          confirmButtonText: "New Game",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            setUpNewGame();
-          } else {
-            all.forEach((element) =>
-              element.removeEventListener("click", getSelection)
-            );
-          }
-        });
-        winner = true;
-      }
-    }
+  if (!checkWinner(gameStatus, player)) {
+    return false;
   }
+
+  winner = true;
+  lockBoard();
+
+  Swal.fire({
+    title: `${player} Won the Game`,
+    imageUrl: "./img/celebration.png",
+    showCancelButton: true,
+    confirmButtonText: "New Game",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      setUpNewGame();
+    }
+  });
+
+  return true;
 }
 /**
+ * Checking if a player has won based on the winning conditions and the current state of the board
+ * @param board - Carries the current state of the board
+ * @param player - Carries the player that is being checked for a win
+ * @returns - Returns true if the player has won, otherwise returns false
+ */
+function checkWinner(board, player) {
+  for (const condition of winningConditions) {
+    const [a, b, c] = condition;
+
+    if (board[a] === player && board[b] === player && board[c] === player) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
  * Checks if there is a tie in the game if no winner has been selected
+ * @returns - Returns true if there is a tie, otherwise returns false
  */
 function checkIfTie() {
   if (!gameStatus.includes("") && winner == false) {
+    lockBoard();
     Swal.fire({
       title: "Tie Game",
       imageUrl: "./img/tie.png",
@@ -180,28 +179,42 @@ function checkIfTie() {
     }).then((result) => {
       if (result.isConfirmed) {
         setUpNewGame();
-      } else {
-        all.forEach((element) =>
-          element.removeEventListener("click", getSelection)
-        );
       }
     });
+    return true;
   }
+  return false;
 }
 
 /**
  * Sets up a new game to be played
  */
 function setUpNewGame() {
+  if (computerTimeout) {
+    clearTimeout(computerTimeout);
+    computerTimeout = null;
+  }
+
   gameStatus.fill("");
   player = "X";
-  window.location.reload();
+  winner = false;
+  boardLocked = false;
+
+  renderBoard();
+
+  document.getElementById("player").textContent = "X";
 }
 
 /**
  * If a game is being played and the user selects the "2 player" button again then it resets the game
  */
 function twoPlayer() {
+  computer = false;
+  difficulty = "";
+
+  document.getElementById("gametype").textContent = "2 Player";
+  document.getElementById("difficulty").textContent = "—";
+
   setUpNewGame();
 }
 
@@ -209,38 +222,112 @@ function twoPlayer() {
 /* START COMPUTER CODE */
 
 /**
- * Initiates the starting of the computer code
+ * Initiates the starting of the computer code by showing the user difficulty options to select from
+ * and then calling the selectDifficulty function based on the user's selection
  */
 function computerStart() {
-  computer = true;
-  document.getElementById("gametype").textContent = "Computer";
+  Swal.fire({
+    title: "Select Difficulty",
+    text: "Choose how challenging you want the computer to be.",
+    showDenyButton: true,
+    showCancelButton: true,
+    confirmButtonText: "Easy",
+    denyButtonText: "Medium",
+    cancelButtonText: "Hard",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      selectDifficulty("easy");
+    } else if (result.isDenied) {
+      selectDifficulty("medium");
+    } else if (result.dismiss === Swal.DismissReason.cancel) {
+      selectDifficulty("hard");
+    }
+  });
 }
 
 /**
- * Runs the picking of the computer code
+ * Setting the difficulty level for the computer and starting a new game
+ * @param level - Carries the difficulty level that the user has selected
+ */
+function selectDifficulty(level) {
+  difficulty = level;
+  computer = true;
+
+  document.getElementById("gametype").textContent = "Computer";
+  document.getElementById("difficulty").textContent = `${capitalize(level)}`;
+  setUpNewGame();
+}
+
+/**
+ * Runs the computer player by first getting difficulty level and then getting the move that the computer will make based on the difficulty level
  */
 function computerPlayer() {
-  let occurrences = gameStatus.reduce((a, v) => (v === "O" ? a + 1 : a), 0);
-  switch (occurrences) {
-    case 0:
-      randomPick(); //move one
-      break;
-    case 1:
-      pickSpot2(); // move two
-      break;
-    case 2:
-      randomPick(); // move three
-      break;
-    case 3:
-      randomPick(); // move four
-      break;
-    default:
+  let move;
+
+  if (difficulty === "easy") {
+    move = getRandomMove();
+  } else if (difficulty === "medium") {
+    move = getMediumMove();
+  } else if (difficulty === "hard") {
+    move = getBestMove();
   }
+
+  if (move === undefined || move === -1) {
+    return;
+  }
+
+  computerMove(move);
 }
 
 /**
+ * Gets a random move for the computer to make - Used for easy difficulty
+ * @returns - Returns the index of the move that the computer will make
+ */
+function getRandomMove() {
+  let availableMoves = getAvailableMoves(gameStatus);
+
+  let randomIndex = Math.floor(Math.random() * availableMoves.length);
+
+  return availableMoves[randomIndex];
+}
+
+/**
+ * Medium difficulty move selection - tries to block the player from winning, otherwise picks a random move
+ * @returns - Returns the index of the move that the computer will make
+ */
+function getMediumMove() {
+  // Try to win
+  for (const move of getAvailableMoves(gameStatus)) {
+    gameStatus[move] = AI;
+
+    if (checkWinner(gameStatus, AI)) {
+      gameStatus[move] = "";
+      return move;
+    }
+
+    gameStatus[move] = "";
+  }
+
+  // Try to block the player
+  for (const move of getAvailableMoves(gameStatus)) {
+    gameStatus[move] = HUMAN;
+
+    if (checkWinner(gameStatus, HUMAN)) {
+      gameStatus[move] = "";
+      return move;
+    }
+
+    gameStatus[move] = "";
+  }
+
+  // Otherwise make a random move
+  return getRandomMove();
+}
+
+/**
+ * Handles the computer making a move on the board
  * @param index number - Carries the index of the spot that the computer has selected
- * Runs the computer move
+ * @returns - Returns true if the computer has won, otherwise returns false
  */
 function computerMove(index) {
   gameStatus[index] = "O";
@@ -256,65 +343,98 @@ function computerMove(index) {
 }
 
 /**
- * Function for picking the second spot for the computer
+ * Finding the best move for the computer to make
+ * @param board - Carries the current state of the board
+ * @returns - Returns an array of the available moves that can be made on the board
  */
-function pickSpot2() {
-  let spotPicked = false;
-  let xarray = [];
-  for (let m = 0; m < gameStatus.length; m++) {
-    if (gameStatus[m] === "X") {
-      xarray.push(m);
+function getAvailableMoves(board) {
+  let moves = [];
+
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] === "") {
+      moves.push(i);
     }
   }
-  for (let p = 0; p <= 7; p++) {
-    const winCondition = winningConditions[p];
 
-    let a = winCondition[0];
-    let b = winCondition[1];
-    let c = winCondition[2];
+  return moves;
+}
 
-    if (a === xarray[0] || a === xarray[1]) {
-      if (b === xarray[0] || b === xarray[1]) {
-        spotPicked = true;
-        setTimeout(function () {
-          if (gameStatus[c] === "O") {
-            // call to make a random pick since above condition was met
-            randomPick();
-          } else {
-            computerMove(c);
-          }
-        }, 2000);
-      } else if (c === xarray[0] || c === xarray[1]) {
-        spotPicked = true;
-        setTimeout(function () {
-          if (gameStatus[b] === "O") {
-            // call to make a random pick since above conditon was met
-            randomPick();
-          } else {
-            computerMove(b);
-          }
-        }, 2000);
-      }
-    }
+/**
+ * Minimax algorithm for the computer to find the best move to make
+ * @param board - Carries the current state of the board
+ * @param isMaximizing - Carries a boolean value to determine if the computer is maximizing or minimizing
+ * @param depth - Carries the depth of the recursion
+ * @returns - Returns the score of the current board state
+ */
+function minimax(board, isMaximizing, depth) {
+  if (checkWinner(board, AI)) {
+    return 10 - depth;
   }
-  if (spotPicked === false) {
-    randomPick();
+
+  if (checkWinner(board, HUMAN)) {
+    return depth - 10;
+  }
+
+  if (boardFull(board)) return 0;
+
+  if (isMaximizing) {
+    let bestScore = -Infinity;
+
+    for (const move of getAvailableMoves(board)) {
+      board[move] = AI;
+
+      let score = minimax(board, false, depth + 1);
+
+      board[move] = "";
+
+      bestScore = Math.max(score, bestScore);
+    }
+
+    return bestScore;
+  } else {
+    let bestScore = Infinity;
+
+    for (const move of getAvailableMoves(board)) {
+      board[move] = HUMAN;
+
+      let score = minimax(board, true, depth + 1);
+
+      board[move] = "";
+
+      bestScore = Math.min(score, bestScore);
+    }
+
+    return bestScore;
   }
 }
 
 /**
- * Finding a random spot on the board that is open to be selected for the computer
+ * Getting the best move for the computer to make based on the minimax algorithm
+ * @returns - Returns the index of the best move for the computer to make
  */
-function randomPick() {
-  let pick = Math.floor(Math.random() * 9);
-  if (gameStatus[pick] === "") {
-    setTimeout(function () {
-      computerMove(pick);
-    }, 2000);
-  } else {
-    randomPick();
+function getBestMove() {
+  let bestScore = -Infinity;
+
+  let move = -1;
+
+  for (const spot of getAvailableMoves(gameStatus)) {
+    gameStatus[spot] = AI;
+
+    let score = minimax(gameStatus, false, 0);
+
+    gameStatus[spot] = "";
+
+    if (score > bestScore) {
+      bestScore = score;
+      move = spot;
+    }
   }
+
+  return move;
 }
+
+/*----------------------------*/
+/* End Computer Code */
 
 /**
  * Helper functions for disabling and enabling the board when the computer is playing
@@ -325,4 +445,22 @@ function lockBoard() {
 
 function unlockBoard() {
   boardLocked = false;
+}
+
+/**
+ * checking if the board is full
+ * @param board - Carries the current state of the board
+ * @returns - Returns true if the board is full, otherwise returns false
+ */
+function boardFull(board) {
+  return !board.includes("");
+}
+
+/**
+ *
+ * @param word - Carries the word that needs to be capitalized
+ * @returns - Returns the word with the first letter capitalized
+ */
+function capitalize(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
 }
